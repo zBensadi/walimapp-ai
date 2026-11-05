@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WalimApp — Salles des fêtes en Algérie</title>
+<meta name="description" content="WalimApp demo: search Algerian wedding halls across 69 wilayas, AI concierge ranking, panoramic previews, booking inquiries.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
+<script defer src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+<script defer src="/app.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="#/">
+      <span class="brand-mark" aria-hidden="true">W</span>
+      <span class="brand-name">WalimApp <em id="brandSubtitle"></em></span>
+    </a>
+    <nav class="topnav" aria-label="Principal">
+      <a href="#/" data-nav="search">Recherche</a>
+      <a href="#/track" data-nav="track">Suivi</a>
+      <a href="#/owner" data-nav="owner">Propriétaire</a>
+    </nav>
+    <div id="navAuth" class="nav-auth" aria-live="polite"></div>
+    <div class="top-actions">
+      <span id="aiBadge" class="aibadge demo" title="">DEMO</span>
+      <div class="langsel" role="group" aria-label="Language">
+        <button data-lang="fr" class="on">FR</button>
+        <button data-lang="ar">AR</button>
+        <button data-lang="en">EN</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="view" class="wrap"></main>
+
+<footer class="footer">
+  <div class="wrap foot-in">
+    <p id="footNote"></p>
+    <p class="foot-sub">WalimApp · Hackathon demo · Meta AI Developer Hackathon 2026</p>
+  </div>
+</footer>
+</body>
+</html>

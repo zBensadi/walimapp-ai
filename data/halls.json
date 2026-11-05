@@ -1,0 +1,521 @@
+{
+  "halls": [
+    {
+      "address": {
+        "ar": "الجزائر العاصمة",
+        "en": "Algiers",
+        "fr": "Alger"
+      },
+      "amenities": [
+        "parking",
+        "clim",
+        "cuisine",
+        "sono",
+        "deco",
+        "vestiaire"
+      ],
+      "capacityMax": 800,
+      "capacityMin": 200,
+      "commune": "Hydra",
+      "desc": {
+        "ar": "قاعة راقية في قلب العاصمة، مثالية لحفلات الزفاف الكبيرة مع مسرح واسع وخدمة متكاملة.",
+        "en": "An elegant hall in the heart of the capital, ideal for large weddings with a wide stage and full service.",
+        "fr": "Salle élégante au cœur de la capitale, idéale pour les grands mariages avec une vaste scène et un service complet."
+      },
+      "id": "h-alger-royal",
+      "name": {
+        "ar": "القاعة الملكية",
+        "en": "Royal Banquet Hall",
+        "fr": "Salle des Fêtes Royale"
+      },
+      "phone": "+213550000001",
+      "priceDzd": 650000,
+      "rating": 4.8,
+      "reviews": 214,
+      "styles": [
+        "moderne",
+        "oriental"
+      ],
+      "wilaya": "16"
+    },
+    {
+      "address": {
+        "ar": "باب الزوار، الجزائر",
+        "en": "Bab Ezzouar, Algiers",
+        "fr": "Bab Ezzouar, Alger"
+      },
+      "amenities": [
+        "parking",
+        "clim",
+        "cuisine",
+        "sono"
+      ],
+      "capacityMax": 450,
+      "capacityMin": 120,
+      "commune": "Bab Ezzouar",
+      "desc": {
+        "fr": "Salle moderne à prix raisonnable, proche de l'aéroport avec un grand parking.",
+        "ar": "Salle moderne à prix raisonnable, proche de l'aéroport avec un grand parking.",
+        "en": "Salle moderne à prix raisonnable, proche de l'aéroport avec un grand parking."
+      },
+      "id": "h-alger-nour",
+      "name": {
+        "fr": "Salle Ennour",
+        "ar": "Salle Ennour",
+        "en": "Salle Ennour"
+      },
+      "phone": "+213550000002",
+      "priceDzd": 320000,
+      "rating": 4.5,
+      "reviews": 167,
+      "styles": [
+        "moderne",
+        "minimaliste"
+      ],
+      "wilaya": "16",
+      "tourScenes": [],
+      "photos": [],
+      "firstTourScene": null
+    },
+    {
+      "address": {
+        "ar": "درارية، الجزائر",
+        "en": "Draria, Algiers",
+        "fr": "Draria, Alger"
+      },
+      "amenities": [
+        "parking",
+        "jardin",
+        "cuisine",
+        "sono",
+        "deco"
+      ],
+      "capacityMax": 600,
+      "capacityMin": 150,
+      "commune": "Draria",
+      "desc": {
+        "ar": "قاعة مع حديقة خارجية رائعة لحفلات الصيف وجلسات التصوير.",
+        "en": "A hall with a beautiful outdoor garden for summer weddings and photo sessions.",
+        "fr": "Salle avec un magnifique jardin extérieur pour les mariages d'été et les séances photo."
+      },
+      "id": "h-alger-jardin",
+      "name": {
+        "ar": "قاعة حديقة الياسمين",
+        "en": "Jasmine Garden Hall",
+        "fr": "Salle Jardin Jasmin"
+      },
+      "phone": "+213550000003",
+      "priceDzd": 480000,
+      "rating": 4.7,
+      "reviews": 98,
+      "styles": [
+        "exterieur",
+        "traditionnel"
+      ],
+      "wilaya": "16"
+    },
+    {
+      "address": {
+        "ar": "وهران",
+        "en": "Oran",
+        "fr": "Oran"
+      },
+      "amenities": [
+        "parking",
+        "clim",
+        "cuisine",
+        "sono",
+        "deco",
+        "hebergement"
+      ],
+      "capacityMax": 1000,
+      "capacityMin": 300,
+      "commune": "Bir El Djir",
+      "desc": {
+        "ar": "أكبر قاعة في الغرب الجزائري، تجهيزات فاخرة وإطلالة على البحر.",
+        "en": "The largest hall in western Algeria, luxurious fittings and a sea view.",
+        "fr": "La plus grande salle de l'ouest algérien, équipements luxueux et vue sur mer."
+      },
+      "id": "h-oran-mediterranee",
+      "name": {
+        "ar": "قاعة البحر الأبيض المتوسط",
+        "en": "Mediterranean Palace",
+        "fr": "Palais Méditerranée"
+      },
+      "phone": "+213550000004",
+      "priceDzd": 850000,
+      "rating": 4.9,
+      "reviews": 301,
+      "styles": [
+        "moderne",
+        "oriental"
+      ],
+      "wilaya": "31"
+    },
+    {
+      "address": {
+        "ar": "السانية، وهران",
+        "en": "Es Senia, Oran",
+        "fr": "Es Sénia, Oran"
+      },
+      "amenities": [
+        "parking",
+        "clim",
+        "sono"
+      ],
+      "capacityMax": 350,
+      "capacityMin": 100,
+      "commune": "Es Senia",
+      "desc": {
+        "ar": "قاعة عائلية دافئة، مثالية للحفلات المتوسطة بميزانية مدروسة.",
+        "en": "A warm family hall, perfect for medium celebrations on a sensible budget.",
+        "fr": "Salle familiale chaleureuse, parfaite pour les fêtes moyennes avec un budget maîtrisé."
+      },
+      "id": "h-oran-emir",
+      "name": {
+        "ar": "قاعة الأمير",
+        "en": "Emir Hall",
+        "fr": "Salle El Émir"
+      },
+      "phone": "+213550000005",
+      "priceDzd": 240000,
+      "rating": 4.3,
+      "reviews": 76,
+      "styles": [
+        "traditionnel",
+        "moderne"
+      ],
+      "wilaya": "31"
+    },
+    {
+      "address": {
+        "ar": "قسنطينة",
+        "en": "Constantine",
+        "fr": "Constantine"
+      },
+      "amenities": [
+        "parking",
+        "clim",
+        "cuisine",
+        "sono",
+        "deco",
+        "vestiaire"
+      ],
+      "capacityMax": 700,
+      "capacityMin": 200,
+      "commune": "El Khroub",
+      "desc": {
+        "ar": "قاعة فخمة على الطراز القسنطيني الأصيل مع زخارف تقليدية.",
+        "en": "A sumptuous hall in authentic Constantine style with traditional ornamentation.",
+        "fr": "Salle somptueuse de style constantinois authentique avec ornements traditionnels."
+      },
+      "id": "h-const-cirta",
+      "name": {
+        "ar": "قاعة سيرتا",
+        "en": "Cirta Hall",
+        "fr": "Salle Cirta"
+      },
+      "phone": "+213550000006",
+      "priceDzd": 520000,
+      "rating": 4.6,
+      "reviews": 143,
+      "styles": [
+        "traditionnel",
+        "oriental"
+      ],
+      "wilaya": "25"
+    },
+    {
+      "address": {
+        "ar": "البليدة",
+        "en": "Blida",
+        "fr": "Blida"
+      },
+      "amenities": [
+        "parking",
+        "jardin",
+        "cuisine",
+        "sono"
+      ],
+      "capacityMax": 500,
+      "capacityMin": 150,
+      "commune": "Ouled Yaich",
+      "desc": {
+        "ar": "قاعة محاطة ببساتين البرتقال، أجواء طبيعية ساحرة.",
+        "en": "A hall surrounded by orange groves, a charming natural atmosphere.",
+        "fr": "Salle entourée de vergers d'orangers, atmosphère naturelle charmante."
+      },
+      "id": "h-blida-verger",
+      "name": {
+        "ar": "قاعة بستان الورود",
+        "en": "Rose Orchard Hall",
+        "fr": "Salle Verger des Roses"
+      },
+      "phone": "+213550000007",
+      "priceDzd": 380000,
+      "rating": 4.6,
+      "reviews": 112,
+      "styles": [
+        "exterieur",
+        "moderne"
+      ],
+      "wilaya": "09"
+    },
+    {
+      "address": {
+        "ar": "سطيف",
+        "en": "Setif",
+        "fr": "Sétif"
+      },
+      "amenities": [
+        "parking",
+        "clim",
+        "cuisine",
+        "sono",
+        "deco"
+      ],
+      "capacityMax": 650,
+      "capacityMin": 180,
+      "commune": "El Eulma",
+      "desc": {
+        "ar": "قاعة واسعة بتصميم عصري وتقنيات صوت وإضاءة حديثة.",
+        "en": "A spacious hall with modern design and state-of-the-art sound and lighting.",
+        "fr": "Salle spacieuse au design moderne avec sonorisation et éclairage dernière génération."
+      },
+      "id": "h-setif-hodna",
+      "name": {
+        "ar": "قاعة الحضنة",
+        "en": "Hodna Hall",
+        "fr": "Salle El Hodna"
+      },
+      "phone": "+213550000008",
+      "priceDzd": 410000,
+      "rating": 4.4,
+      "reviews": 89,
+      "styles": [
+        "moderne",
+        "minimaliste"
+      ],
+      "wilaya": "19"
+    },
+    {
+      "address": {
+        "ar": "عنابة",
+        "en": "Annaba",
+        "fr": "Annaba"
+      },
+      "amenities": [
+        "parking",
+        "clim",
+        "cuisine",
+        "sono",
+        "deco",
+        "hebergement"
+      ],
+      "capacityMax": 550,
+      "capacityMin": 150,
+      "commune": "El Bouni",
+      "desc": {
+        "ar": "قاعة أنيقة قرب الشاطئ، مثالية لحفلات الزفاف الصيفية.",
+        "en": "An elegant hall near the beach, perfect for summer weddings.",
+        "fr": "Salle élégante près de la plage, parfaite pour les mariages d'été."
+      },
+      "id": "h-annaba-rim",
+      "name": {
+        "ar": "قاعة الريم",
+        "en": "Errym Beach Hall",
+        "fr": "Salle Errym Plage"
+      },
+      "phone": "+213550000009",
+      "priceDzd": 460000,
+      "rating": 4.5,
+      "reviews": 94,
+      "styles": [
+        "moderne",
+        "exterieur"
+      ],
+      "wilaya": "23"
+    },
+    {
+      "address": {
+        "ar": "تيزي وزو",
+        "en": "Tizi Ouzou",
+        "fr": "Tizi Ouzou"
+      },
+      "amenities": [
+        "parking",
+        "cuisine",
+        "sono",
+        "deco"
+      ],
+      "capacityMax": 400,
+      "capacityMin": 120,
+      "commune": "Azazga",
+      "desc": {
+        "ar": "قاعة بطابع قبائلي أصيل، ضيافة تقليدية وأجواء عائلية.",
+        "en": "A hall with authentic Kabyle character, traditional hospitality and family atmosphere.",
+        "fr": "Salle au caractère kabyle authentique, hospitalité traditionnelle et ambiance familiale."
+      },
+      "id": "h-tizi-amazigh",
+      "name": {
+        "ar": "قاعة الأمازيغ",
+        "en": "Amazigh Heritage Hall",
+        "fr": "Salle Amazigh"
+      },
+      "phone": "+213550000010",
+      "priceDzd": 290000,
+      "rating": 4.7,
+      "reviews": 121,
+      "styles": [
+        "traditionnel",
+        "minimaliste"
+      ],
+      "wilaya": "15"
+    },
+    {
+      "address": {
+        "ar": "بجاية",
+        "en": "Bejaia",
+        "fr": "Béjaïa"
+      },
+      "amenities": [
+        "parking",
+        "clim",
+        "cuisine",
+        "sono"
+      ],
+      "capacityMax": 380,
+      "capacityMin": 100,
+      "commune": "Amizour",
+      "desc": {
+        "ar": "قاعة عصرية بين الجبل والبحر، مثالية للحفلات الحميمة.",
+        "en": "A modern hall between mountain and sea, ideal for intimate celebrations.",
+        "fr": "Salle moderne entre montagne et mer, idéale pour les fêtes intimes."
+      },
+      "id": "h-bejaia-gouraya",
+      "name": {
+        "ar": "قاعة قورايا",
+        "en": "Gouraya Hall",
+        "fr": "Salle Gouraya"
+      },
+      "phone": "+213550000011",
+      "priceDzd": 270000,
+      "rating": 4.4,
+      "reviews": 68,
+      "styles": [
+        "minimaliste",
+        "moderne"
+      ],
+      "wilaya": "06"
+    },
+    {
+      "address": {
+        "ar": "تلمسان",
+        "en": "Tlemcen",
+        "fr": "Tlemcen"
+      },
+      "amenities": [
+        "parking",
+        "clim",
+        "cuisine",
+        "sono",
+        "deco",
+        "vestiaire"
+      ],
+      "capacityMax": 600,
+      "capacityMin": 180,
+      "commune": "Mansourah",
+      "desc": {
+        "ar": "قاعة أندلسية فاخرة بزخارف زيرية، تحفة معمارية لحفل لا يُنسى.",
+        "en": "A luxurious Andalusian hall with Zirid ornamentation, an architectural gem for an unforgettable wedding.",
+        "fr": "Salle andalouse luxueuse aux ornements zirides, joyau architectural pour un mariage inoubliable."
+      },
+      "id": "h-tlemcen-andalou",
+      "name": {
+        "ar": "القصر الأندلسي",
+        "en": "Andalusian Palace",
+        "fr": "Palais Andalou"
+      },
+      "phone": "+213550000012",
+      "priceDzd": 590000,
+      "rating": 4.8,
+      "reviews": 156,
+      "styles": [
+        "oriental",
+        "traditionnel"
+      ],
+      "wilaya": "13"
+    },
+    {
+      "address": {
+        "ar": "ورقلة",
+        "en": "Ouargla",
+        "fr": "Ouargla"
+      },
+      "amenities": [
+        "parking",
+        "clim",
+        "cuisine",
+        "sono"
+      ],
+      "capacityMax": 450,
+      "capacityMin": 150,
+      "commune": "Rouissat",
+      "desc": {
+        "ar": "قاعة مكيفة بالكامل ومجهزة لصحراء الجنوب، راحة مضمونة صيفاً.",
+        "en": "A fully air-conditioned hall equipped for the southern desert, guaranteed comfort in summer.",
+        "fr": "Salle entièrement climatisée et équipée pour le sud désertique, confort garanti en été."
+      },
+      "id": "h-ouargla-sahara",
+      "name": {
+        "ar": "قاعة واحة الصحراء",
+        "en": "Sahara Oasis Hall",
+        "fr": "Salle Oasis du Sahara"
+      },
+      "phone": "+213550000013",
+      "priceDzd": 310000,
+      "rating": 4.2,
+      "reviews": 57,
+      "styles": [
+        "traditionnel",
+        "oriental"
+      ],
+      "wilaya": "30"
+    },
+    {
+      "address": {
+        "ar": "مسعد، الجلفة",
+        "en": "Messaad, Djelfa",
+        "fr": "Messaad, Djelfa"
+      },
+      "amenities": [
+        "parking",
+        "cuisine",
+        "sono"
+      ],
+      "capacityMax": 300,
+      "capacityMin": 80,
+      "commune": "Messaad",
+      "desc": {
+        "ar": "قاعة جديدة في ولاية مسعد (69)، أسعار افتتاحية مناسبة للعائلات.",
+        "en": "A new hall in wilaya Messaad (69), opening prices suited to families.",
+        "fr": "Nouvelle salle dans la wilaya de Messaad (69), prix d'ouverture adaptés aux familles."
+      },
+      "id": "h-messaad-nouvelle",
+      "name": {
+        "ar": "قاعة مسعد الجديدة",
+        "en": "New Messaad Hall",
+        "fr": "Salle Nouvelle Messaad"
+      },
+      "phone": "+213550000014",
+      "priceDzd": 180000,
+      "rating": 4.1,
+      "reviews": 23,
+      "styles": [
+        "minimaliste",
+        "traditionnel"
+      ],
+      "wilaya": "69"
+    }
+  ]
+}
