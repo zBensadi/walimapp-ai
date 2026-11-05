@@ -461,6 +461,12 @@ const I18N = {
   navAdmin: { fr: 'Administration', ar: 'الإدارة', en: 'Administration' },
   ownerApplyHint: { fr: 'Vous possédez une salle des fêtes ?', ar: 'هل تملكون قاعة حفلات؟', en: 'Do you own a wedding hall?' },
   ownerApplyCta: { fr: 'Espace Propriétaire — Déposer une candidature', ar: 'فضاء المالك — تقديم طلب', en: 'Owner Space — Submit an application' },
+  ownerRegisterCta: { fr: "Devenir propriétaire d'une salle", ar: 'التسجيل كصاحب قاعة', en: 'Apply to become a hall owner' },
+  ownerApprovalNote: {
+    fr: "Les candidatures de propriétaires de salle nécessitent l'approbation du Super Admin.",
+    ar: 'تخضع طلبات أصحاب القاعات لموافقة المشرف العام.',
+    en: 'Hall owner applications require Super Admin approval.',
+  },
   ownerRegTitle: { fr: 'Candidature propriétaire', ar: 'طلب مالك', en: 'Owner application' },
   ownerRegSub: {
     fr: 'Présentez votre établissement. L’administration examinera votre candidature avant d’activer votre espace opérationnel.',
@@ -1276,7 +1282,7 @@ function viewOwnerRegister() {
       <p class="error" id="ownerRegErr" hidden></p>
       <div class="btn-row"><button class="btn gold" type="submit">${esc(tr('submitApplication'))}</button></div>
     </form>
-    <p class="hint" style="margin-top:12px"><a href="#/login">${esc(tr('backToLogin'))}</a></p>
+    <p class="hint" style="margin-top:12px"><a href="#/owner">${esc(tr('backToLogin'))}</a></p>
   </div>`;
 }
 
@@ -1445,6 +1451,8 @@ function viewOwnerLogin() {
       <p class="error" id="ownerLoginErr" hidden></p>
       <div class="btn-row"><button class="btn gold" type="submit">${esc(tr('loginBtn'))}</button></div>
     </form>
+    <p class="hint" style="margin-top:12px"><a href="#/owner/register">${esc(tr('ownerRegisterCta'))}</a></p>
+    <p class="hint">${esc(tr('ownerApprovalNote'))}</p>
   </div>`;
 }
 
@@ -1454,6 +1462,8 @@ function viewOwnerSetup() {
     <h1>${esc(tr('ownerSetupTitle'))}</h1>
     <p class="lead">${esc(tr('ownerNotConfiguredHint'))}</p>
     <div class="code-hint" dir="ltr"><code>OWNER_EMAIL=owner@example.dz</code><br><code>OWNER_PASSWORD=choose-a-strong-password</code></div>
+    <p class="hint" style="margin-top:12px"><a href="#/owner/register">${esc(tr('ownerRegisterCta'))}</a></p>
+    <p class="hint">${esc(tr('ownerApprovalNote'))}</p>
   </div>`;
 }
 
