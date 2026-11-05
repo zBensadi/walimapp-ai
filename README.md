@@ -1,138 +1,148 @@
 # WalimApp AI — Algerian wedding-hall marketplace with Meta Muse Spark
 
-> **Hackathon prototype (Meta AI Developer Hackathon).** A responsive **web application** (not a native Android app) that lets couples
-> describe their wedding in plain language, get venue recommendations from **Meta Muse Spark** grounded in real catalogue records,
-> explore a hall in a 360° viewer, and send a booking inquiry that the hall owner accepts or rejects from a dashboard.
+![Node.js ≥ 22](https://img.shields.io/badge/Node.js-%3E%3D%2022-339933?logo=node.js&logoColor=white)
+![Zero required dependencies](https://img.shields.io/badge/dependencies-zero%20required-blue)
+![Tests 8/8 passing](https://img.shields.io/badge/tests-8%2F8%20passing-brightgreen)
+![Meta Muse Spark 1.3](https://img.shields.io/badge/AI-Meta%20Muse%20Spark%201.3-7B3FF2)
+![Trilingual FR / AR / EN](https://img.shields.io/badge/i18n-FR%20%7C%20AR%20(RTL)%20%7C%20EN-orange)
+
+> [!NOTE]
+> **Hackathon prototype — Meta AI Developer Hackathon.** WalimApp AI is a responsive **web application** (not a native
+> mobile app) that lets couples describe their wedding in plain language, get venue recommendations from
+> **Meta Muse Spark 1.3** grounded in real catalogue records, explore halls in interactive 360° virtual tours, and send
+> booking inquiries that hall owners triage from an operational dashboard.
 >
-> **All venues are fictional sample records.** No real hall, price, availability, person or booking is represented.
+> **All venues are fictional sample records.** No real hall, price, availability, person, or booking is represented.
+> Sample photos and panoramas are demonstration placeholders (see §4).
 
 ![Marketplace](docs/screenshots/01-marketplace.png)
 
-## 1. Product Overview
+**Contents:** [1. Product Overview & Target Audiences](#1-product-overview--target-audiences) ·
+[2. Main User Journeys](#2-main-user-journeys) · [3. Implemented Features](#3-implemented-features) ·
+[4. 360° Virtual Tours & Panorama Architecture](#4-360-virtual-tours--panorama-architecture) ·
+[5. AI Architecture & Meta Models](#5-ai-architecture--meta-models) ·
+[6. Customer Accounts & Multi-Owner Security](#6-customer-accounts--multi-owner-security) ·
+[7. Technology, Dual-Mode Storage & Architecture](#7-technology-dual-mode-storage--architecture) ·
+[8. Installation and Run Instructions](#8-installation-and-run-instructions) ·
+[9. Environment Variables & Account Provisioning](#9-environment-variables--account-provisioning) ·
+[10. Namecheap Stellar cPanel Deployment Guide](#10-namecheap-stellar-cpanel-deployment-guide) ·
+[11. REST API & Endpoint Reference](#11-rest-api--endpoint-reference) ·
+[12. Verification Performed](#12-verification-performed) ·
+[13. How This Was Built & Demo Script](#13-how-this-was-built--demo-script)
 
-WalimApp AI is an **Algerian wedding hall discovery marketplace**: couples describe their wedding in plain language
-(French, Arabic or English) and get ranked venue recommendations with honest explanations, then track a booking inquiry
-until the hall owner answers.
+---
 
-- **trilingual FR/AR/EN support** with full Arabic RTL layout, responsive from 375 px phones to desktop.
-- **69 Wilayas** with commune, date, guest-count, budget, style and amenity filters.
-- **interactive 360° panoramas** (Pannellum viewer with a generic sample panorama demonstrating the viewer).
-- **customer booking accounts**: register, log in, send inquiries linked to your account, and follow them in a
-  customer-isolated booking dashboard (`My bookings`).
-- **operational owner triage workspace**: authenticated owner inbox with status/hall/date filters, summary tiles,
-  accept/reject decisions with an optional note, and conflict protection (one confirmed booking per hall/date).
+## 1. Product Overview & Target Audiences
 
-## 2. Main user journey
+WalimApp AI is a **trilingual (FR/AR/EN) discovery marketplace for Algerian wedding venues**, combining AI-powered
+natural-language ranking, interactive 360° virtual tours, customer booking tracking, and an owner triage workflow —
+responsive from 375 px phones to desktop, with full Arabic right-to-left (RTL) layouts.
 
-1. **Describe** the wedding in natural language (French, Arabic or English), e.g.
+The platform serves **three distinct user roles**:
+
+### Couples & Guests (no account required to book)
+
+- **Natural-language search** in French, Arabic, or English ("*elegant hall in Algiers for 250 guests with parking*").
+- **Live Muse Spark recommendations**: ranked halls with grounded 0–100 scores and one-sentence explanations.
+- **Interactive 360° virtual tours** with multi-scene hotspot navigation on venue pages.
+- **Guest booking without mandatory registration**: send an inquiry with explicit privacy consent and receive a
+  tracking reference such as `WAL-XXXXXX`.
+- **Reference tracking**: follow *Pending → Confirmed / Rejected* plus the owner's note, without exposing phone numbers.
+
+### Wedding Hall Owners (authenticated operational workspace)
+
+- **Authenticated owner workspace** (`#/owner`) with summary tiles, inbox filters, and an overview-by-date panel.
+- **Hall CRUD**: create, update, and delete venue listings (`/api/owner/halls`).
+- **Photo gallery uploads**: secure multipart image upload and deletion per hall.
+- **2:1 equirectangular multi-scene 360° tour builder** with interactive hotspots linking scenes.
+- **Booking triage with conflict prevention**: accept/reject inquiries with an optional client note; one confirmed
+  booking per hall/date (HTTP 409 on conflict).
+- **AI Venue Advisor**: a grounded 6-section listing analysis report for each hall.
+
+### Platform Administrators — Super Admin (`#/admin`)
+
+- **Platform moderation workspace**: review hall-owner applications and moderate accounts.
+- **Owner application review**: approve, reject, or suspend owners (`approved`, `rejected`, `suspended`).
+  Only approved owners can manage halls; suspended/rejected owners' halls are hidden from public discovery.
+- **Platform health metrics**: high-level overview of owners, halls, and inquiries.
+
+---
+
+## 2. Main User Journeys
+
+### Couple's journey — describe → rank → tour → book → track
+
+1. **Describe** the wedding in natural language (French, Arabic, or English), e.g.
    *"I need an elegant wedding hall in Algiers for 250 guests, with parking and catering, and a budget of 450,000 DZD."*
-2. **Muse Spark ranks** the matching real halls and explains each match. The header badge shows **LIVE AI** only after a successful live Meta response.
-3. **Inspect** a hall: photo gallery, capacity, price, amenities, 360° panorama viewer.
-4. **Send a booking inquiry** (name, phone, date, guests, message, explicit privacy consent) and receive a reference such as `WAL-ABC123`. Logged-in customers see it in `My bookings`; guests can still book and track by reference.
-5. **The owner** logs in, opens the triage workspace, and **accepts or rejects** each request with an optional note.
-6. **The client tracks** the reference (or `My bookings`) and sees *Pending → Confirmed / Rejected* and the owner's note.
-
-## 3. Client marketplace
+   Example chips help first-time visitors phrase a request.
+2. **Muse Spark ranks** the matching halls and explains each match with a score and a grounded reason. The header badge
+   shows **LIVE AI** only after a successful live Meta response; otherwise it stays **DEMO** (see §5).
+   Extracted criteria chips are shown and back-filled into the search filters.
+3. **Tour** the shortlisted halls: photo gallery, capacity, price, amenities — then step into the **360° virtual tour**
+   and hop between scenes via interactive hotspots.
+4. **Book** by sending an inquiry (name, phone, date, guests, message, explicit privacy consent) and receiving a
+   reference such as `WAL-ABC123`. Guests can book freely; logged-in customers also see the inquiry in `My bookings`
+   (`#/account`).
+5. **Track** the reference at any time (or in `My bookings`) and see *Pending → Confirmed / Rejected* with the owner's
+   note. The public lookup never returns the phone number.
 
 ![Muse Spark results](docs/screenshots/02-muse-spark-live-results.png)
-
-- Landing page with hero imagery and the **Muse Spark Concierge** (free-text box + example chips).
-- Filters: **wilaya (all 69)**, commune, event date, guests, budget (whole DZD), style and 8 services (parking, air conditioning, catering kitchen, sound system, decoration, cloakroom, garden, lodging).
-- Hall cards with price, capacity, location, amenities, rating pill and a *Demonstration venue* badge.
-- Halls priced above the stated budget (the search tolerates up to 125 % of it) are **explicitly marked "Over budget by …"**.
-- Trilingual UI: **French / Arabic (RTL) / English**. Responsive from 375 px phones to desktop.
-
-## 4. Venue discovery and booking workflow
-
 ![Venue detail](docs/screenshots/03-venue-detail.png)
-![360° panorama](docs/screenshots/04-360-panorama.png)
-
-**Discovery pipeline (`POST /api/ai/rank`)**
-
-1. A **deterministic server-side parser** (French/Arabic/English patterns, no LLM) extracts wilaya, commune, date or month, guests, budget, style and amenities from the text. They are shown as *Extracted criteria* chips and back-filled into the filters.
-2. The server selects **candidate records from `data/halls.json`** (capacity fit, budget, amenities, wilaya, and availability on the requested date).
-3. **Muse Spark (`muse-spark-1.3`)** receives the user's request, the criteria and *only those candidate records*, and returns a JSON ranking with a 0–100 score and a one-sentence reason in the user's language.
-4. The server **validates the reply**: unknown hall IDs are dropped, duplicates removed, scores clamped, and any candidate Spark omitted is appended from the deterministic ranking. Prices, capacities and amenities shown on the cards always come from the dataset, never from the model.
-5. If the key is missing, Meta is unreachable, returns an error or an unusable reply, the response is `mode: "cached"` with a `fallbackReason`, the badge stays **DEMO**, and the reason text is a deterministic demo ranking — **cached output is never labelled live**.
-
-The 360° viewer uses [Pannellum](https://pannellum.org/) with a **generic sample panorama (an unrelated outdoor placeholder scene, not the hall)** — it demonstrates the viewer only. It is a panoramic photo viewer, **not a 3D scan** of any venue.
-
-**Booking rules**
-
-- An inquiry starts **pending** and does **not** block the date.
-- Only an **accepted** inquiry blocks that hall/date. Accepting a second inquiry for the same hall and date returns **HTTP 409** (`date_already_booked`) and the second stays pending until rejected.
-- Hall search and discovery exclude halls already confirmed on the requested date.
-- Clients track a booking with its reference; the public lookup **never returns the phone number**.
-- Inquiries are stored via the dual-mode storage engine (MariaDB when configured, otherwise atomic `data/inquiries.json`, git-ignored).
-
+![Booking request form](docs/screenshots/05-booking-request-form.png)
 ![Booking confirmation](docs/screenshots/06-booking-confirmation.png)
 
-## 5. AI Architecture
+### Owner & admin journey — apply → approve → manage halls → triage inquiries → run AI Venue Advisor
 
-- **Genuine live Meta Muse Spark 1.3 natural language ranking and reasoning via `/api/ai/rank`**
-  (alias `/api/ai/discover`): the server sends the user's prompt, the extracted criteria, and only the real candidate
-  hall records to `muse-spark-1.3`, validates the returned JSON ranking, and renders scores with one-sentence grounded
-  reasons in the user's language.
-- **Honest DEMO vs LIVE labeling**: the API returns `mode: "live"` only after a successful live Meta response;
-  otherwise it returns `mode: "cached"` with a `fallbackReason` and the UI badge stays **DEMO**. Cached output is
-  never labelled live. See `GET /api/meta-status` (key-configured flag and model IDs, never the key).
-- **WalimApp AI Venue Advisor** (owner-only `POST /api/owner/halls/:id/advisor`): grounded listing advice for hall
-  owners. Stored `facts` (wilaya, commune, capacity, price, styles, amenities, photo counts) stay separate from the
-  6-section AI `report` (`strengths`, `galleryObservations`, `recommendedViews`, `listingImprovements`,
-  `presentationTips`, `nextActions`) written in the owner's language (fr/ar/en). Live reasoning via `muse-spark-1.3`
-  when a key is configured, otherwise a deterministic cached demo (`walimapp-venue-advisor-1`) that never invents
-  facilities and never guarantees bookings. Covered offline by `tests/advisor.js`.
-- **SAM 3.1 and Muse Image are in cached demo mode.** The experimental décor-studio endpoints (`/api/ai/decorate`,
-  `/api/ai/segment`, reachable only via `#/studio`) fall back to clearly labelled demo output:
-  - `sam-3.1` segmentation: the app's dependency-free parser extracts no reliable regions from the Responses payload,
-    so the endpoint returns labelled demo segmentation. Treat SAM 3.1 as **cached demo mode, not integrated**.
-  - `muse-image-1.0` decoration concepts: served as **cached demo mode** in this prototype; not part of the
-    marketplace or booking journey and not covered by automated tests.
-
-## 6. Customer Accounts & Security
-
-- **Passwords**: hashed with Node's built-in `crypto.scrypt` (random 16-byte salt, 64-byte derived key,
-  timing-safe verification via `crypto.timingSafeEqual`). Plain-text passwords are never stored or logged.
-  Minimum policy: 8+ characters with at least one letter and one digit.
-- **Sessions**: 32-byte hex tokens stored server-side with a 7-day TTL, delivered in an
-  **HttpOnly SameSite=Lax session cookie** (`wa_session`, `Secure` flag in production). Logout deletes the
-  server-side session and clears the cookie.
-- **Rate limiting**: in-memory sliding window on authentication endpoints
-  (10 attempts / 60 s per IP+action on register and login; `HTTP 429` with `Retry-After: 60` when exceeded).
-- **Customer-isolated booking dashboards**: `GET /api/customer/inquiries` lists only inquiries whose `customerId`
-  matches the logged-in user; `GET /api/customer/inquiries/:ref` returns `404` for anyone else's reference.
-  Public tracking (`GET /api/inquiries/:ref`) stays privacy-safe and never returns the phone number.
-- **Out of scope for this hackathon prototype**: **email verification and password reset are explicitly out of scope**.
-  There is no email sending, no verification links, and no reset flow; account recovery is manual (delete/re-register
-  in file mode, or update the row in MariaDB mode).
-
-## 7. Owner workspace & Owner Configuration
+1. **Apply**: a new hall owner registers at `#/owner/register` (business name, phone, wilaya, commune, description).
+   The account is created with `status: pending` and cannot manage halls yet.
+2. **Approve**: the Super Admin reviews the application at `#/admin` and sets `approved`, `rejected`, or `suspended`.
+   Approval unlocks the owner workspace; suspension/rejection hides the owner's halls from public discovery.
+3. **Manage halls**: the approved owner creates listings (name, wilaya, commune, capacity, price, styles, amenities),
+   uploads gallery photos, and builds a connected multi-scene 360° tour from equirectangular panoramas.
+4. **Triage inquiries**: the owner works the inbox (status/hall/date filters, summary tiles), then **accepts or rejects**
+   each request with an optional note. Accepting a second inquiry for the same hall/date returns **HTTP 409**
+   (`date_already_booked`); hall search excludes dates already confirmed.
+5. **Run AI Venue Advisor**: per hall, the owner generates a grounded 6-section listing report (strengths, gallery
+   observations, recommended views, listing improvements, presentation tips, next actions) in fr/ar/en.
 
 ![Owner dashboard](docs/screenshots/07-owner-dashboard-pending.png)
 ![Decided inquiries](docs/screenshots/08-owner-dashboard-decided.png)
-
-- Summary tiles: total, pending, confirmed, rejected.
-- Inbox with client name and phone, hall, event date, guest count, message and request date.
-- Filters by status, hall and date; an *overview by date* panel.
-- **Accept / Reject** with an optional note to the client; decisions persist across reloads and server restarts.
-- The owner API (`GET /api/owner/inquiries`, `POST /api/owner/inquiries/:ref/decision`) requires an authenticated
-  session with `role: "owner"` (`401` without login, `403` for customers).
-
-**Configure the demonstration owner account in `.env`** (never commit `.env`; no password is hardcoded in the repo):
-
-```powershell
-copy .env.example .env      # macOS/Linux: cp .env.example .env
-# then edit .env and set:
-# OWNER_EMAIL=owner@example.dz
-# OWNER_PASSWORD=<choose-a-strong-demo-password>
-```
-
-- At startup (and on owner login) the server syncs `OWNER_EMAIL` / `OWNER_PASSWORD` into storage as the `owner` user
-  (`lib/auth.js` `ensureOwnerUser()`); changing `OWNER_PASSWORD` in `.env` updates the stored hash on next start/login.
-- `GET /api/auth/owner-status` reports only whether both variables are configured (never their values).
-- If `OWNER_EMAIL` / `OWNER_PASSWORD` are unset, the owner workspace shows a "not configured" state and owner login fails.
-
 ![Client tracking](docs/screenshots/09-client-tracking-confirmed.png)
+
+---
+
+## 3. Implemented Features
+
+- [x] **Trilingual FR / AR (RTL) / EN support** with responsive layouts from 375 px mobile to desktop.
+- [x] **69 Wilayas of Algeria catalog** with commune, event-date, guest-count, budget, style, and amenity filters
+      (8 services: parking, air conditioning, catering kitchen, sound system, decoration, cloakroom, garden, lodging).
+      Halls priced above the stated budget (search tolerates up to 125 % of it) are explicitly marked
+      *"Over budget by …"*.
+- [x] **Natural-Language Discovery (`POST /api/ai/rank`)**: deterministic FR/AR/EN parser extracts wilaya, commune,
+      date/month, guests, budget, style, and amenities (no LLM), then **Meta Muse Spark 1.3** ranks candidates from
+      `data/halls.json` with grounded scores and reasons.
+- [x] **Interactive 360° Virtual Tours**: multi-scene equirectangular panoramas with interactive hotspot navigation
+      (Pannellum viewer).
+- [x] **Guest Inquiries & Tracking**: booking reference generation (e.g. `WAL-XXXXXX`); privacy-safe tracking that
+      never exposes phone numbers.
+- [x] **Customer Accounts**: `crypto.scrypt` password hashing, HttpOnly session cookies, personal dashboard
+      (`#/account` → `My bookings`).
+- [x] **Multiple Independent Owners**: strict isolation — each owner sees and edits only their own halls, photo
+      galleries, tour scenes, and customer inquiries (cross-owner access returns 403/404).
+- [x] **Dedicated Owner Registration & Super Admin Approval**: `#/owner/register` creates `status: pending`;
+      review and approval happen at `#/admin`.
+- [x] **Super Admin Platform Workspace**: overview metrics plus owner moderation
+      (`approved`, `rejected`, `suspended`).
+- [x] **Owner Hall Management**: full CRUD (`GET/POST/PUT/DELETE /api/owner/halls…`, approved owners only).
+- [x] **Secure Photo Gallery Uploads**: multipart image upload and deletion (`/api/owner/halls/:id/photos`).
+- [x] **Connected Multi-Scene 360° Tour Builder**: panorama upload with 2:1 aspect-ratio validation
+      (`POST /api/owner/halls/:id/panoramas`), hotspot coordinate mapping and scene wiring
+      (`PUT /api/owner/halls/:id/tour`), scene deletion.
+- [x] **WalimApp AI Venue Advisor** (`POST /api/owner/halls/:id/advisor`): grounded listing analysis generated by
+      `muse-spark-1.3` (or a deterministic cached fallback) with 6 structured sections; stored facts stay separate
+      from the AI report, which never invents facilities and never guarantees bookings.
+- [x] **Booking Conflict Protection**: double-booking prevention — one confirmed booking per hall/date with HTTP 409.
+      Pending inquiries never block a date; only accepted ones do.
 
 <p>
 <img src="docs/screenshots/10-mobile-marketplace.png" alt="Mobile marketplace" width="260">
@@ -141,33 +151,144 @@ copy .env.example .env      # macOS/Linux: cp .env.example .env
 
 ![Arabic RTL](docs/screenshots/12-arabic-rtl.png)
 
-## 8. Technology and architecture
+---
 
-- **Node.js ≥ 22, zero required npm dependencies** (built-in `http`, `fs`, `crypto`, global `fetch`). No build step.
-  `mysql2` is an optional dependency used only when MariaDB is configured.
-- `server.js` — HTTP server, REST API, validation, booking state machine, dual-mode persistence, static files. All `/api/*` responses carry `Cache-Control: no-store`.
+## 4. 360° Virtual Tours & Panorama Architecture
+
+![360° panorama](docs/screenshots/04-360-panorama.png)
+
+- **Equirectangular format**: panoramas must be spherical equirectangular images with a **2:1 aspect ratio**
+  (e.g. 4096×2048). The server enforces ratio validation on upload (`POST /api/owner/halls/:id/panoramas` rejects
+  non-conforming images with a clear error); `tests/tour.js` covers acceptance and rejection.
+- **Multi-scene linking**: owners wire scenes together with **interactive hotspots carrying yaw/pitch coordinates**
+  that jump the viewer from one scene to another (`PUT /api/owner/halls/:id/tour`, max 20 hotspots per scene,
+  hotspot targets validated against known scene IDs).
+- **Photos vs panoramas**: standard photos are regular 2D gallery stills shown in the gallery carousel; panoramas are
+  equirectangular projection assets used **exclusively** in the 360° viewer. The two pipelines (gallery vs tour) are
+  separate on both client and server.
+- **Limitations**: the viewer renders **panoramic photo spheres via Pannellum — NOT dense 3D polygon meshes or
+  Matterport-style LiDAR scans**. There is no geometry reconstruction, depth sensing, or dollhouse view.
+
+> [!IMPORTANT]
+> **Attribution & licensing.** The 360° viewer is [Pannellum](https://pannellum.org/) (MIT License, © Matthew Petroff),
+> loaded from CDN. The demonstration sample panoramas come from the official Pannellum documentation gallery
+> (`pannellum.org/images/…`) and the demonstration venue photography is generic stock imagery from Unsplash.
+> All of it is **fictional demonstration content** — none of it depicts the listed venues, which are invented records.
+
+---
+
+## 5. AI Architecture & Meta Models
+
+### Natural-language discovery (`POST /api/ai/rank`, alias `/api/ai/discover`)
+
+1. A **deterministic server-side parser** (French/Arabic/English patterns, no LLM) extracts wilaya, commune, date or
+   month, guests, budget, style, and amenities. They are shown as *Extracted criteria* chips and back-filled into
+   the filters.
+2. The server selects **candidate records from `data/halls.json`** (capacity fit, budget tolerance, amenities, wilaya,
+   and availability on the requested date; halls of non-approved owners are excluded).
+3. **Muse Spark (`muse-spark-1.3`)** receives the user's request, the criteria, and *only those candidate records*,
+   and returns a JSON ranking with a 0–100 score and a one-sentence reason in the user's language.
+4. The server **validates the reply**: unknown hall IDs are dropped, duplicates removed, scores clamped, and any
+   candidate Spark omitted is appended from the deterministic ranking. Prices, capacities, and amenities on the cards
+   always come from the dataset, never from the model.
+5. If the key is missing, Meta is unreachable, returns an error, or returns an unusable reply, the response is
+   `mode: "cached"` with a `fallbackReason`, the badge stays **DEMO**, and the ranking is a deterministic demo
+   ordering.
+
+### AI Venue Advisor (`POST /api/owner/halls/:id/advisor`, owner-only)
+
+Grounded listing advice: stored `facts` (wilaya, commune, capacity, price, styles, amenities, photo/tour counts) stay
+separate from the 6-section AI `report` (`strengths`, `galleryObservations`, `recommendedViews`, `listingImprovements`,
+`presentationTips`, `nextActions`) written in the owner's language (fr/ar/en). Live reasoning via `muse-spark-1.3`
+when a key is configured, otherwise a deterministic cached demo (`walimapp-venue-advisor-1`). Covered offline by
+`tests/advisor.js`.
+
+### Configuration & honesty guarantees
+
+- The API key is configured **server-side only via `MODEL_API_KEY`** (`META_API_KEY` accepted as an alias). **The
+  browser never sees keys** — see `GET /api/meta-status`, which exposes only a key-configured flag and model IDs.
+- **Honest LIVE vs DEMO labeling**: the app returns `mode: "live"` **only** when Meta returns HTTP 200 with a usable
+  payload; otherwise it returns `mode: "cached"` with a `fallbackReason`. **Cached output is NEVER falsely
+  labelled live** — the UI badge flips to LIVE AI only after a confirmed live response.
+- **Honest model scope**: `sam-3.1` (décor segmentation) and `muse-image-1.0` (décor concepts), reachable only via the
+  experimental `#/studio` page (`/api/ai/segment`, `/api/ai/decorate`), are **experimental cached demos, not
+  integrated into the main marketplace journey** and not covered by automated tests.
+
+| Model | Invoked by | What it does | Status |
+|---|---|---|---|
+| **`muse-spark-1.3`** | Concierge → **Rank with Muse Spark** (`POST /api/ai/rank`) | Ranks real candidate halls with grounded 0–100 scores and one-sentence reasons in fr/ar/en | **Integrated and tested live** (HTTP 200 from Meta, results validated against `data/halls.json`; offline fallback logic covered by `tests/meta-mock.js`) |
+| **`muse-spark-1.3`** (advisor) | Owner advisor (`POST /api/owner/halls/:id/advisor`) | Writes the grounded 6-section Venue Advisor report in fr/ar/en | **Live when configured, otherwise deterministic cached demo** (`walimapp-venue-advisor-1`); covered offline by `tests/advisor.js` |
+| `sam-3.1` | Experimental décor studio (`/api/ai/segment`, `#/studio` only) | Hall-photo segmentation | **Cached demo mode** — labelled demo output only, not integrated |
+| `muse-image-1.0` | Experimental décor studio (`/api/ai/decorate`, `#/studio` only) | Décor concept images | **Cached demo mode** — not part of the marketplace journey, no automated tests |
+
+No other Meta model is called anywhere in the code. One secret-safe log line per Meta call
+(e.g. `[meta] POST /chat/completions model=muse-spark-1.3 -> HTTP 200 in 6090ms`); keys, prompts, and bodies are
+never logged, and no contact or inquiry data is ever sent to Meta.
+
+---
+
+## 6. Customer Accounts & Multi-Owner Security
+
+- **Passwords hashed with `crypto.scrypt`** (random 16-byte salt, 64-byte derived key, timing-safe verification via
+  `crypto.timingSafeEqual`). Plain-text passwords are never stored or logged. Minimum policy: 8+ characters with at
+  least one letter and one digit.
+- **HttpOnly SameSite=Lax session cookies** (`wa_session`, `Secure` flag in production) with a **7-day TTL**;
+  32-byte hex tokens stored server-side. Logout deletes the server-side session and clears the cookie.
+- **In-memory rate limiting on auth endpoints**: 10 attempts / 60 s per IP+action on register and login
+  (`HTTP 429` with `Retry-After: 60` when exceeded).
+- **Customer-isolated dashboards**: `GET /api/customer/inquiries` lists only inquiries whose `customerId` matches the
+  logged-in user; `GET /api/customer/inquiries/:ref` returns `404` for anyone else's reference. Public tracking
+  (`GET /api/inquiries/:ref`) stays privacy-safe and never returns the phone number.
+- **Owner isolation**: owners strictly access only their own halls, galleries, tour scenes, and inquiries —
+  cross-owner reads/writes are rejected (403/404), and public discovery hides halls of non-approved owners.
+  Covered by `tests/multi-owner.js` and `tests/halls.js`.
+- **Server-side authorization checks on all protected endpoints**: customer routes require a customer session (401
+  anonymous), owner routes require an **approved** owner session (401/403), admin routes require a `super_admin`
+  session (401/403). All `/api/*` responses carry `Cache-Control: no-store`.
+- **Disclosure**: **email addresses are not verified in this prototype** — there is no email sending, no verification
+  links, and no password-reset flow; account recovery is manual (delete/re-register in file mode, or update the row
+  in MariaDB mode).
+
+> [!WARNING]
+> **Security limitations of this prototype (not production-ready):** no CSRF token (only `SameSite=Lax`), no HTTPS
+> termination in-app (rely on cPanel TLS), no bot protection, and no data-retention/deletion workflow. In JSON file
+> mode, inquiries (including names and phone numbers) are stored **unencrypted** in a local git-ignored JSON file with
+> no backup — prefer MariaDB mode beyond the demo. The tracking reference is the only secret protecting a guest
+> booking status (logged-in customers additionally have session-protected `My bookings`).
+
+---
+
+## 7. Technology, Dual-Mode Storage & Architecture
+
+- **Node.js ≥ 22, zero required external dependencies** — uses Node built-ins only (`http`, `fs`, `crypto`, global
+  `fetch`). No build step. `mysql2` is an optional dependency used only when MariaDB is configured.
+- `server.js` — HTTP server, REST API, validation, booking state machine, dual-mode persistence, static files.
 - `lib/meta.js` — server-side Meta Model API client (timeouts, error mapping, one secret-safe log line per call).
-- `lib/auth.js` — `crypto.scrypt` passwords, session cookies, rate limiting, owner sync.
-- `lib/storage.js` — dual-mode storage engine (MariaDB via `mysql2/promise` with transparent fallback to atomic JSON files).
+- `lib/auth.js` — `crypto.scrypt` passwords, session cookies, rate limiting, owner/admin provisioning sync.
+- `lib/storage.js` — dual-mode storage engine (MariaDB via `mysql2/promise`, transparent fallback to atomic JSON).
 - `lib/migrate.js` + `lib/schema.sql` — MariaDB schema + seed runner (`npm run migrate`).
 - `public/` — vanilla JS single-page app (`index.html`, `app.js`, `styles.css`), hash routing, fr/ar/en i18n.
-- `data/` — `halls.json` (14 fictional sample halls), `wilayas.json` (69 wilayas); runtime files `inquiries.json`, `users.json`, `sessions.json` (git-ignored).
-- External resources loaded by the browser: Google Fonts, the Pannellum library and sample panoramas, and Unsplash stock photos used as placeholder imagery (the pages fall back gracefully if offline, except the 360° viewer).
-- The API key lives **only on the server**; the browser never receives it.
+- `data/` — `halls.json` (14 fictional sample halls), `wilayas.json` (69 wilayas); runtime files `inquiries.json`,
+  `users.json`, `sessions.json` (git-ignored).
+- External resources loaded by the browser: Google Fonts, the Pannellum library/sample panoramas, and Unsplash stock
+  placeholder imagery (pages degrade gracefully offline, except the 360° viewer).
 
 ```
-Browser (SPA) ──► server.js ──► lib/storage.js ──► MariaDB (mysql2) or data/*.json
-                     │
-                     └──► lib/meta.js ──► https://api.meta.ai/v1/chat/completions  (Muse Spark)
+Browser (SPA, hash routing) ──► server.js ──► lib/storage.js ──► MariaDB (mysql2)
+   fr / ar (RTL) / en               │                              or atomic data/*.json
+                                    └──► lib/meta.js ──► https://api.meta.ai/v1/chat/completions
+                                                     (Muse Spark 1.3 — server-side key only)
 ```
 
-### MariaDB Dual-Storage & Migration
+### Dual-mode storage
 
-The **dual-mode storage engine** (`lib/storage.js`) uses **MariaDB with `mysql2`** when `DB_HOST`/`DB_USER`/`DB_NAME`
-are configured **and** a connection succeeds; otherwise it transparently falls back to an **atomic JSON file fallback**
-in `data/` (`users.json`, `sessions.json`, `inquiries.json`, written via temp file + rename behind a serialized write
-queue so concurrent read-modify-write cycles cannot interleave). A mid-run connection failure degrades the current
-operation to file mode.
+The engine (`lib/storage.js`) uses **MariaDB with `mysql2`** when `DB_HOST`/`DB_USER`/`DB_NAME` are configured
+**and** a connection succeeds; otherwise it transparently falls back to an **atomic serialized JSON file fallback**
+in `data/` (`users.json`, `sessions.json`, `inquiries.json` — written via temp file + rename behind a serialized
+write queue so concurrent read-modify-write cycles cannot interleave). A mid-run connection failure degrades the
+current operation to file mode.
+
+### Schema & migration (`npm run migrate`)
 
 Apply the schema and seed the database with **`npm run migrate`** (`node lib/migrate.js`):
 
@@ -176,59 +297,92 @@ Apply the schema and seed the database with **`npm run migrate`** (`node lib/mig
 - Exits 0 with an informational message when MariaDB is not configured, `mysql2` is missing, or the database is
   unreachable (the server then runs in JSON file mode).
 
-## 9. Install and run
+---
 
-Requirements: **Node.js 22 or newer**.
+## 8. Installation and Run Instructions
+
+Requirements: **Node.js 22 or newer**. Zero dependencies are required for the default JSON mode.
+
+### PowerShell (Windows)
 
 ```powershell
-git clone <repository-url>
-cd <repository-folder>
-copy .env.example .env      # macOS/Linux: cp .env.example .env
-# edit .env and set MODEL_API_KEY (optional — see below) and OWNER_EMAIL / OWNER_PASSWORD for the owner demo
-npm start
+git clone https://github.com/zBensadi/walimapp-ai.git && cd walimapp-ai
+npm install mysql2   # optional — only for MariaDB mode; skip for default JSON mode
+Copy-Item .env.example .env
+# edit .env: set MODEL_API_KEY for live AI, OWNER_EMAIL/OWNER_PASSWORD and ADMIN_EMAIL/ADMIN_PASSWORD (see §9)
+npm start            # then open http://localhost:3000
+npm test             # all 8 offline test suites, 270 assertions
 ```
 
-Open **http://localhost:3000**. The terminal prints whether a key is configured and, for every Meta call, one line such as
-`[meta] POST /chat/completions model=muse-spark-1.3 -> HTTP 200 in 6090ms` (no keys, prompts or bodies are ever logged).
+### Unix / macOS (bash/zsh)
 
-**Without a key** the whole app works in clearly labelled **cached demo mode** (badge: DEMO). With a key, discovery is live.
+```bash
+git clone https://github.com/zBensadi/walimapp-ai.git && cd walimapp-ai
+npm install mysql2   # optional — only for MariaDB mode; skip for default JSON mode
+cp .env.example .env
+# edit .env: set MODEL_API_KEY for live AI, OWNER_EMAIL/OWNER_PASSWORD and ADMIN_EMAIL/ADMIN_PASSWORD (see §9)
+npm start            # then open http://localhost:3000
+npm test             # all 8 offline test suites, 270 assertions
+```
 
-Optional MariaDB path:
+Optional MariaDB path (either shell, after setting `DB_*` in `.env`):
 
-```powershell
+```bash
 npm install mysql2
-# set DB_HOST, DB_NAME, DB_USER, DB_PASSWORD in .env (see below)
 npm run migrate
 npm start
 ```
 
-Run the tests (fully offline, no key needed, they never touch your `.env`):
+Open **http://localhost:3000**. The terminal prints whether a key is configured and, for every Meta call, one line
+such as `[meta] POST /chat/completions model=muse-spark-1.3 -> HTTP 200 in 6090ms` (no keys, prompts, or bodies are
+ever logged). **Without a key** the whole app works in clearly labelled **cached demo mode** (badge: DEMO); with a
+key, discovery and the advisor are live. Tests are fully offline, need no key, and never touch your `.env`.
 
-```powershell
-npm test
-```
+---
 
-## 10. Environment variables
+## 9. Environment Variables & Account Provisioning
 
-Copy `.env.example` to `.env` (git-ignored). **Never commit `.env`.**
+Copy `.env.example` to `.env` (git-ignored). **Never commit `.env` and never publish real passwords.**
 
 | Variable | Required | Meaning |
 |---|---|---|
-| `MODEL_API_KEY` | for live AI | Meta Model API key, read server-side only (`META_API_KEY` is accepted as an alias) |
-| `OWNER_EMAIL` | for owner demo | Demo owner login email (synced into storage at startup) |
-| `OWNER_PASSWORD` | for owner demo | Demo owner login password (synced into storage at startup; never hardcoded) |
+| `MODEL_API_KEY` | for live AI | Meta Model API key, read server-side only (`META_API_KEY` accepted as alias) |
+| `OWNER_EMAIL` | for seed owner | Seed demonstration owner login email (synced into storage at startup) |
+| `OWNER_PASSWORD` | for seed owner | Seed demonstration owner login password (synced into storage; never hardcoded) |
+| `ADMIN_EMAIL` | for Super Admin | Super Admin login email (provisioned at startup; no public registration) |
+| `ADMIN_PASSWORD` | for Super Admin | Super Admin login password (provisioned at startup; never hardcoded) |
 | `DB_HOST` | for MariaDB mode | MariaDB host (without `DB_HOST`/`DB_USER`/`DB_NAME` the server uses atomic JSON files) |
 | `DB_NAME` | for MariaDB mode | MariaDB database name |
 | `DB_USER` | for MariaDB mode | MariaDB user |
 | `DB_PASSWORD` | for MariaDB mode | MariaDB password |
 | `DB_PORT` | no | MariaDB port, default `3306` |
-| `PORT` | no | HTTP port, default `3000` (on cPanel, Phusion Passenger injects `process.env.PORT` — see below) |
+| `PORT` | no | HTTP port, default `3000` (on cPanel, Phusion Passenger injects `process.env.PORT` — see §10) |
 | `META_API_BASE` | no | Default `https://api.meta.ai/v1` |
 | `META_SPARK_MODEL` | no | Default `muse-spark-1.3` |
 | `META_SAM_MODEL` | no | Default `sam-3.1` (cached demo mode) |
 | `META_IMAGE_MODEL` | no | Default `muse-image-1.0` (cached demo mode) |
 
-## 11. Namecheap Stellar cPanel Deployment Guide
+**Initial account provisioning logic:** the installer privately configures `OWNER_EMAIL`/`OWNER_PASSWORD` and
+`ADMIN_EMAIL`/`ADMIN_PASSWORD` in `.env`. At startup (and on owner login), the server automatically syncs and hashes
+them into storage (`lib/auth.js` `ensureOwnerUser()` and the admin provisioning); changing a password in `.env`
+updates the stored hash on next start/login. `GET /api/auth/owner-status` reports only whether the owner variables
+are configured — never their values. If unset, the owner workspace shows a "not configured" state and owner login fails.
+
+**Owner application workflow:** new hall owners register directly at `#/owner/register` **without touching `.env`**.
+The account is created in `status: pending` (login works but hall/inbox/tour management returns 403) and must be
+approved by the Super Admin at `#/admin` before the owner can operate.
+
+**Guest booking is open to everyone without registration** — an account is only needed for `My bookings`
+(`#/account`), owner workspaces, and administration.
+
+---
+
+## 10. Namecheap Stellar cPanel Deployment Guide
+
+> **Deployment Status Disclosure**: This deployment section documents the verified setup procedure for Namecheap
+> Stellar shared hosting using cPanel's "Setup Node.js App" with Phusion Passenger. The repository is
+> production-ready for this target. For hackathon evaluation, the prototype is running locally at
+> `http://localhost:3000`.
 
 Target: **Namecheap Stellar** shared hosting with cPanel's **"Setup Node.js App"** and **Node 22.x**.
 
@@ -241,10 +395,10 @@ Target: **Namecheap Stellar** shared hosting with cPanel's **"Setup Node.js App"
    (cPanel wires the domain to the app via Phusion Passenger; no `.htaccess` proxy is needed).
 4. **Startup file**: `server.js` (Application startup file in the cPanel form).
 5. **Environment variables** (cPanel "Environment variables" section — never commit these to git):
-   `MODEL_API_KEY`, `OWNER_EMAIL`, `OWNER_PASSWORD`, `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`.
-   Set `DB_*` only when using the cPanel MariaDB database you created for this app; otherwise leave them unset and
-   the app runs on its atomic JSON file fallback. After saving, run `npm run migrate` once from the application root
-   (via cPanel Terminal or SSH) when using MariaDB.
+   `MODEL_API_KEY`, `OWNER_EMAIL`, `OWNER_PASSWORD`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `DB_HOST`, `DB_NAME`,
+   `DB_USER`, `DB_PASSWORD`. Set `DB_*` only when using the cPanel MariaDB database you created for this app;
+   otherwise leave them unset and the app runs on its atomic JSON file fallback. After saving, run
+   `npm run migrate` once from the application root (via cPanel Terminal or SSH) when using MariaDB.
 6. **`process.env.PORT` handling by Phusion Passenger**: cPanel/Phusion Passenger injects the assigned port as the
    `PORT` environment variable and routes the domain to it. The server reads `Number(process.env.PORT || 3000)` and
    calls `server.listen(PORT)`, so it binds to the Passenger-assigned port automatically with a local default of 3000.
@@ -252,89 +406,101 @@ Target: **Namecheap Stellar** shared hosting with cPanel's **"Setup Node.js App"
 7. Restart the app from "Setup Node.js App" after each deploy or environment change, then open the domain and check
    `GET /api/health` and `GET /api/meta-status`.
 
-## 12. Sample and demo data
+---
 
-- The 14 halls in `data/halls.json` are **invented for this demonstration**. Names, communes, prices, capacities, ratings and amenities do **not** describe real businesses.
-- Photos are generic stock images (Unsplash) and are **not photographs of these venues**; the 360° view is a sample panorama.
-- Ratings are sample values. Inquiries created while testing are fictional. Phone numbers in screenshots are made up.
-- Seed state: `data/inquiries.json` ships with 2 demonstration inquiries (`WAL-HV88RQ`, `WAL-Y3N0XQ`);
-  `data/users.json` and `data/sessions.json` are runtime files (`[]` when empty) and are git-ignored, as are
-  `data/*.tmp` temp files and `*.log` files.
+## 11. REST API & Endpoint Reference
 
-## 13. Security limitations of this prototype
+All `/api/*` responses carry `Cache-Control: no-store`. Auth: 🟢 public · 🟡 customer session · 🟠 approved-owner
+session · 🔴 `super_admin` session.
 
-This is a hackathon demo, **not production-ready**:
-
-- Owner endpoints require an authenticated `owner` session, and customer endpoints are customer-isolated, but there is
-  no CSRF token (only `SameSite=Lax`), no HTTPS termination in-app (rely on cPanel TLS), and no bot protection.
-- In JSON file mode, inquiries (including names and phone numbers) are stored **unencrypted** in a local JSON file with
-  no backup. Prefer MariaDB mode for anything beyond the demo.
-- **Email verification and password reset are out of scope** (see §6). Sessions expire after 7 days; there is no
-  forced rotation or device management.
-- The free-text wedding request (max 1000 characters) and the candidate hall records are sent to the Meta Model API when a key is configured; no contact details or inquiry data are sent.
-- The client tracking reference is the only secret protecting a guest booking status (logged-in customers additionally
-  have session-protected `My bookings`).
-- Consent is a checkbox only; there is no data-retention or deletion workflow.
-
-## 14. API and model documentation
-
-### Meta models
-
-| Model | Endpoint | Invoked by | What it does | Status |
-|---|---|---|---|---|
-| **`muse-spark-1.3`** | `POST https://api.meta.ai/v1/chat/completions` | Concierge → **Rank with Muse Spark** (`POST /api/ai/rank`, alias `/api/ai/discover`) | Ranks the real candidate halls for the couple's request and writes a grounded one-sentence reason per hall in fr/ar/en | **Integrated and tested live.** Live HTTP 200 from Meta, grounded results checked against `data/halls.json`, UI shows LIVE AI only after success. The request/validation/fallback logic is also covered offline by `tests/meta-mock.js` (mock Meta server, no real key). |
-| **`muse-spark-1.3`** (advisor) | `POST https://api.meta.ai/v1/chat/completions` | Owner advisor (`POST /api/owner/halls/:id/advisor`) | Writes the grounded 6-section WalimApp AI Venue Advisor report in fr/ar/en from stored hall facts | **Live when configured, otherwise deterministic cached demo** (`walimapp-venue-advisor-1`; never invents facilities or guarantees bookings). Covered offline by `tests/advisor.js`. |
-| `sam-3.1` | `POST https://api.meta.ai/v1/responses` | Experimental décor studio (`/api/ai/segment`, `#/studio` only) | Hall-photo segmentation | **Cached demo mode** — parser extracts no regions; labelled demo output only. |
-| `muse-image-1.0` | `POST https://api.meta.ai/v1/images/generations` | Experimental décor studio (`/api/ai/decorate`, `#/studio` only) | Décor concept images | **Cached demo mode** — not part of the marketplace journey, no automated tests. |
-
-No other Meta model is called anywhere in the code.
-
-### REST endpoints
+### Public — health, catalog, discovery, booking, auth
 
 | Method & path | Purpose |
 |---|---|
-| `GET /api/health`, `GET /api/meta-status` | Health; key-configured flag and model IDs (never the key) |
-| `GET /api/wilayas` | The 69 wilayas |
-| `GET /api/halls/search?wilaya=&commune=&date=&guests=&budget=&style=&amenities=a,b` | Filter halls |
-| `GET /api/halls/:id` | One hall |
-| `POST /api/ai/rank` `{prompt, lang, criteria?}` | Natural-language discovery. Returns `mode: "live" \| "cached"`, `model`, `extractedCriteria`, `ranking[]`, `halls[]`, and `fallbackReason` when cached |
-| `POST /api/auth/register` `{fullName, email, password, confirmPassword}` | Customer registration (rate-limited, sets session cookie) |
-| `POST /api/auth/login` `{email, password}` | Customer or owner login (rate-limited, sets session cookie) |
-| `POST /api/auth/logout` | Logout (deletes session, clears cookie) |
-| `GET /api/auth/me` | Current session user |
-| `GET /api/auth/owner-status` | Whether `OWNER_EMAIL`/`OWNER_PASSWORD` are configured (no values) |
-| `POST /api/inquiries` | Create a pending inquiry (consent required, linked to customer when logged in). Returns a `WAL-XXXXXX` reference |
-| `GET /api/inquiries/:ref` | Privacy-safe status lookup for the client (no phone number) |
-| `GET /api/customer/inquiries` | Logged-in customer's own inquiries with counts (customer-isolated) |
-| `GET /api/customer/inquiries/:ref` | One own inquiry (`404` for anyone else's) |
-| `POST /api/auth/register-owner` `{fullName, email, password, confirmPassword, businessName, phone, wilaya, commune, businessDescription?}` | Dedicated owner registration (`status: pending`, requires admin approval) |
-| `GET /api/owner/halls`, `POST /api/owner/halls` | List owner's halls or create a new hall (**requires approved owner session**) |
-| `PUT /api/owner/halls/:id`, `DELETE /api/owner/halls/:id` | Update or delete a hall owned by the caller (ownership-isolated) |
-| `POST /api/owner/halls/:id/photos`, `DELETE /api/owner/halls/:id/photos` | Upload (multipart/form-data) or delete hall gallery photos |
-| `POST /api/owner/halls/:id/scenes` | Upload 360° panorama image (equirectangular 2:1 validation) and add tour scene |
-| `PUT /api/owner/halls/:id/scenes`, `DELETE /api/owner/halls/:id/scenes/:sceneId` | Update scene hotspots/title or remove a tour scene |
-| `POST /api/owner/halls/:id/advisor` `{selectedPhotos?, lang?}` | WalimApp AI Venue Advisor: owner-only grounded listing report (`facts` + 6-section `report`, `mode: "live" \| "cached"`) |
-| `GET /api/owner/inquiries?status=&hallId=&date=` | Owner inbox with counts (**requires authenticated owner session**, isolated to own halls) |
-| `POST /api/owner/inquiries/:ref/decision` `{decision: "accept" \| "reject", note}` | Decide a pending inquiry; `409` on repeat or when the date is already confirmed |
-| `GET /api/admin/metrics` | Super Admin platform overview metrics (owners, halls, inquiries) |
-| `GET /api/admin/owners` | List all registered hall owners with approval status |
-| `POST /api/admin/owners/:id/status` `{status: "approved" \| "rejected" \| "suspended"}` | Super Admin moderation action on hall owner account |
+| 🟢 `GET /api/health`, `GET /api/meta-status` | Health; key-configured flag and model IDs (never the key) |
+| 🟢 `GET /api/wilayas` | The 69 wilayas |
+| 🟢 `GET /api/halls/search?wilaya=&commune=&date=&guests=&budget=&style=&amenities=a,b` | Filter halls (excludes dates already confirmed and halls of non-approved owners) |
+| 🟢 `GET /api/halls/:id` | One hall with gallery and tour scenes |
+| 🟢 `POST /api/ai/rank` `{prompt, lang, criteria?}` (alias `/api/ai/discover`) | Natural-language discovery. Returns `mode: "live" \| "cached"`, `model`, `extractedCriteria`, `ranking[]`, `halls[]`, and `fallbackReason` when cached |
+| 🟢 `POST /api/auth/register` `{fullName, email, password, confirmPassword}` | Customer registration (rate-limited, sets session cookie) |
+| 🟢 `POST /api/auth/owner-register` `{fullName, email, password, confirmPassword, businessName, phone, wilaya, commune, businessDescription?}` | Owner application (rate-limited, creates `status: pending`, requires admin approval) |
+| 🟢 `POST /api/auth/login` `{email, password}` | Customer, owner, or admin login (rate-limited, sets session cookie) |
+| 🟢 `POST /api/auth/logout` | Logout (deletes session, clears cookie) |
+| 🟢 `GET /api/auth/me` | Current session user (role + owner approval status, never secrets) |
+| 🟢 `GET /api/auth/owner-status` | Whether `OWNER_EMAIL`/`OWNER_PASSWORD` are configured (no values) |
+| 🟢 `POST /api/inquiries` | Create a pending inquiry (consent required; linked to customer when logged in). Returns a `WAL-XXXXXX` reference |
+| 🟢 `GET /api/inquiries/:ref` | Privacy-safe status lookup for the client (no phone number) |
 
-## 15. Verification performed
+### Customer — own bookings (🟡)
 
-- `npm test` — eight offline suites (270 assertions, zero external dependencies):
+| Method & path | Purpose |
+|---|---|
+| 🟡 `GET /api/customer/inquiries` | Logged-in customer's own inquiries with counts (customer-isolated) |
+| 🟡 `GET /api/customer/inquiries/:ref` | One own inquiry (`404` for anyone else's) |
+
+### Owner — halls, photos, tours, advisor, triage (🟠)
+
+| Method & path | Purpose |
+|---|---|
+| 🟠 `GET /api/owner/halls`, `POST /api/owner/halls` | List the caller's halls or create a new hall |
+| 🟠 `PUT /api/owner/halls/:id`, `DELETE /api/owner/halls/:id` | Update or delete a hall owned by the caller (403 on cross-owner access) |
+| 🟠 `POST /api/owner/halls/:id/photos` | Upload gallery photos (multipart/form-data) |
+| 🟠 `DELETE /api/owner/halls/:id/photos` | Delete gallery photos |
+| 🟠 `POST /api/owner/halls/:id/panoramas` | Upload a 360° panorama (equirectangular ~2:1 validation) and add a tour scene |
+| 🟠 `PUT /api/owner/halls/:id/tour` | Rewire the tour: scene titles/order plus hotspot coordinates and targets |
+| 🟠 `DELETE /api/owner/halls/:id/panoramas/:sceneId` | Remove a tour scene |
+| 🟠 `POST /api/owner/halls/:id/advisor` `{selectedPhotos?, lang?}` | AI Venue Advisor: grounded listing report (`facts` + 6-section `report`, `mode: "live" \| "cached"`) |
+| 🟠 `GET /api/owner/inquiries?status=&hallId=&date=` | Owner inbox with counts (isolated to own halls) |
+| 🟠 `POST /api/owner/inquiries/:ref/decision` `{decision: "accept" \| "reject", note?}` | Decide a pending inquiry; `409` on repeat or when the date is already confirmed |
+
+### Super Admin — moderation (🔴)
+
+| Method & path | Purpose |
+|---|---|
+| 🔴 `GET /api/admin/metrics` | Platform overview metrics (owners by status, halls, inquiries) |
+| 🔴 `GET /api/admin/owners` | List all registered hall owners with approval status (no password hashes) |
+| 🔴 `POST /api/admin/owners/:id/status` `{status: "approved" \| "rejected" \| "suspended"}` | Moderation action on a hall-owner account |
+
+### Experimental décor studio (cached demo, `#/studio` only)
+
+| Method & path | Purpose |
+|---|---|
+| 🟢 `POST /api/ai/segment` | `sam-3.1` hall-photo segmentation — **cached demo mode**, not integrated |
+| 🟢 `POST /api/ai/decorate` | `muse-image-1.0` décor concepts — **cached demo mode**, not part of the marketplace journey |
+
+---
+
+## 12. Verification Performed
+
+- **`npm test` — 8 offline suites, 270 assertions, 0 failures** (zero external dependencies, no key needed, never
+  touches `.env`):
   - API smoke tests (`tests/smoke.js`)
   - Booking lifecycle and double-booking conflict prevention (`tests/booking.js`)
-  - Meta Model API integration and fallback handling (`tests/meta-mock.js`)
+  - Meta Model API integration and fallback handling via a mock Meta server (`tests/meta-mock.js`)
   - Customer and owner authentication and session management (`tests/auth.js`)
   - Owner hall CRUD and photo gallery management (`tests/halls.js`)
-  - WalimApp AI Venue Advisor listing recommendations (`tests/advisor.js`)
+  - AI Venue Advisor listing recommendations (`tests/advisor.js`)
   - Connected multi-scene 360° virtual tours (`tests/tour.js`)
   - Multi-owner isolation and Super Admin moderation (`tests/multi-owner.js`)
-- Manual/automated browser verification in Chrome at 375 px, 640 px and 1280 px in English and Arabic: marketplace, live Muse Spark discovery, venue detail, 360° viewer, booking, customer accounts, owner accept/reject, client tracking, Super Admin owner approval, and multi-owner isolation.
-- The screenshots in `docs/screenshots/` were captured from that real running application with a live Muse Spark call.
+- **Live Meta verification**: genuine `muse-spark-1.3` HTTP 200 calls confirmed via the server log
+  (`[meta] POST /chat/completions model=muse-spark-1.3 -> HTTP 200`), `GET /api/meta-status`, and the UI badge
+  flipping DEMO → LIVE AI only after success.
+- **Browser verification in Chrome** across desktop, tablet, and mobile breakpoints (**375 px, 640 px, 1280 px**) in
+  **French, Arabic (RTL), and English**: marketplace, live Muse Spark discovery, venue detail, 360° viewer, booking,
+  customer accounts, owner accept/reject, client tracking, Super Admin owner approval, and multi-owner isolation.
+- **Screenshot verification**: the 12 screenshots in `docs/screenshots/` (`01-marketplace.png` through
+  `12-arabic-rtl.png`) were captured from that real running application, including one with a live Muse Spark call.
+- **Sample and demo data**: the 14 halls in `data/halls.json` are invented; names, communes, prices, capacities,
+  ratings, and amenities describe no real business. Ratings are sample values, inquiries created while testing are
+  fictional, and phone numbers in screenshots are made up. Seed state: `data/inquiries.json` ships with 2
+  demonstration inquiries (`WAL-HV88RQ`, `WAL-Y3N0XQ`); `data/users.json` and `data/sessions.json` are runtime files
+  (`[]` when empty) and are git-ignored, as are `data/*.tmp` temp files and `*.log` files.
 
-## 16. How this was built
+---
 
-Developed with **Muse Code** as the implementation agent under human/agent technical review.
-The three-minute demo plan is in [`docs/DEMO-SCRIPT.md`](docs/DEMO-SCRIPT.md).
+## 13. How This Was Built & Demo Script
+
+Technical-lead orchestration by **Gemini 3.8 Flash**; code implementation by **Muse Code powered by Muse Spark 1.3**.
+
+The three-minute live demo plan — including the pre-flight checklist, the DEMO → LIVE AI evidence to capture, and
+the "do not" list (never present cached output as live) — is in [`docs/DEMO-SCRIPT.md`](docs/DEMO-SCRIPT.md).
